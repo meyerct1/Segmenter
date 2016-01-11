@@ -65,7 +65,7 @@ handles.BFchannel = 0;
 handles.imExt = '.tiff';
 handles.NucCh = 1;
 handles.mvWhole_Well = 0;
-handles.axes1 = findobj('Tag','axes1')
+% handles.axes1 = findobj('Tag','axes1');
 
 guidata(hObject, handles);
 
@@ -304,7 +304,7 @@ function edit3_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of edit3 as text
 %        str2double(get(hObject,'String')) returns contents of edit3 as a double
-handles.nucCh = str2double(get(hObject,'String'));
+handles.NucCh = str2double(get(hObject,'String'));
 % Update handles structure
 guidata(hObject, handles);
 
@@ -377,7 +377,7 @@ NucCH = handles.NucCh;
 BF = handles.BFchannel;
 mvWhole_Well = handles.mvWhole_Well
 
- 
+NucCH
  if BF ~=0
      numCh = numChannels - 2;
  else
@@ -448,6 +448,8 @@ mvWhole_Well = handles.mvWhole_Well
  temp = strfind({file_names{:,2}},'Nuc');
  idx = find(cellfun(@isempty,temp)==0);
  im = imread(file_names{idx(1),1});
+ handles.axes1
+ idx
  imshow(im,[],'Parent',handles.axes1);
 
 cd(tempDir)
