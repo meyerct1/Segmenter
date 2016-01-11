@@ -1,0 +1,55 @@
+Steps to create classifiers:
+
+1. Create training set with Well B02
+
+	SegmentReview(1, '~/Work/Images', '~/Work/CellAnimation/segmentation/segment/training_2010-05-01-001.mat');
+
+
+2. Convert training set into csv file:
+
+	SetToCSV(objSet, [name of csv file])
+
+3. Use training set to create classifiers
+
+From Terminal:
+	perl Train.pl args:
+		1. [directory containing csv file of training set]
+		2. [name of csv file]
+
+4. Classifiers are in CellAnimation/segmentation/segment. 
+	Called model[category].Rdata.
+--------------------------------------------------------------
+
+Steps to segment an image stack:
+
+1. Change parameters to reflect your well at beginning of 
+	a. LocalNaiveSegment
+	b. LocalFinish
+	c. LocalGMMSegment
+
+2. Run LocalNaiveSegment in Matlab
+
+3. From Terminal - 
+	perl Classify.pl 	args:
+		1. location of csv files
+		2. location of classifiers
+		3. imageNameBase 
+		4. startIndex
+		5. endIndex
+		6. framestep
+		7. digitsForEnum
+
+4. Run LocalFinish in Matlab
+
+5. Run LocalGMMSegment in Matlab
+
+Output .mat files are in [wellname]/output
+--------------------------------------------------------------
+
+Steps to track image stack:
+
+1. From GUI editor or text editor, change parameters in
+	assayAltSegment.m to reflect your well.
+
+2. Run assayAltSegment in Matlab
+

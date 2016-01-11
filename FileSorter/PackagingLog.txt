@@ -1,0 +1,19 @@
+mcc -o FileSorter -W main:FileSorter -T link:exe -d /home/xnmeyer/Documents/Lab/TNBC_Project/Experiments/Segmentation_Code/FileSorter/for_testing -v /home/xnmeyer/Documents/Lab/TNBC_Project/Experiments/Segmentation_Code/FileSorterGUI.m 
+Compiler version: 6.1 (R2015b)
+
+Dependency analysis by REQUIREMENTS.
+
+[Warning: Adding path
+"/home/xnmeyer/Documents/Lab/TNBC_Project/Experiments/Segmentation_Code" to
+Compiler path instance.] 
+[] 
+Parsing file "/home/xnmeyer/Documents/Lab/TNBC_Project/Experiments/Segmentation_Code/FileSorterGUI.m"
+	(Referenced from: "Compiler Command Line").
+Deleting 0 temporary MEX authorization files.
+Generating file "/home/xnmeyer/Documents/Lab/TNBC_Project/Experiments/Segmentation_Code/FileSorter/for_testing/readme.txt".
+Generating file "/home/xnmeyer/Documents/Lab/TNBC_Project/Experiments/Segmentation_Code/FileSorter/for_testing/run_FileSorter.sh".
+Packaging...
+Creating the bundle...
+Web based installer created at /home/xnmeyer/Documents/Lab/TNBC_Project/Experiments/Segmentation_Code/FileSorter/for_redistribution/MyAppInstaller_web.install.
+Packaging complete.
+Elapsed packaging time was: 19 seconds.
