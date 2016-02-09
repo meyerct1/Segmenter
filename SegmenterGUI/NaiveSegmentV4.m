@@ -1,22 +1,39 @@
-function [CO,Im_array] = NaiveSegmentV3(imExt,cidrecorrect,NucnumLevel,CytonumLevel,surface_segment,nuclear_segment,noise_disk,nuc_noise_disk,...
-    nuclear_segment_factor,surface_segment_factor,cl_border,smoothing_factor,NucSegHeight,numCh,NUC,Cyto,i)
+function [CO,Im_array] = NaiveSegmentV4(imExt,cidrecorrect,NucnumLevel,CytonumLevel,surface_segment,nuclear_segment,noise_disk,nuc_noise_disk,...
+    nuclear_segment_factor,surface_segment_factor,cl_border,smoothing_factor,NucSegHeight,numCh,NUC,Cyto,i,background_corr,CorrIm_file,bd_pathway)
 i
 CO = struct(); %Cellular object structure.  This is where all the information to be saved is stored
 %Find the name of image with the row and column number
-tempIdx = strfind(NUC.filnms(i),'/');
-nm = char(NUC.filnms{i}(tempIdx{1}(length(tempIdx{:}))+1:end));
-foo = strfind(nm, '-');
+
 %Store the row and column names from the filename  This assumes a specific
 %filename format!
-CO.rw = nm(foo(2)+1:foo(2)+3);
-CO.cl = nm(foo(3)+1:foo(3)+3);
-CO.filename = char(nm);
-%Store the time from the file name
-CO.tim.year = str2double(nm(1:4));
-CO.tim.month = str2double(nm(5:6));
-CO.tim.day = str2double(nm(7:8));
-CO.tim.hr = str2double(nm(9:10));
-CO.tim.min = str2double(nm(11:12));
+if bd_pathway
+    idx = strfind(NUC.filnms(i),'/');
+    str = char(NUC.filnms(i));
+    CO.filename =  str(idx{1}(length(idx{:}))+1:end);
+    idx = strfind(NUC.filnms(i), 'Well ');
+    CO.rw = str(idx{1}+5);
+    CO.cl = str(idx{1}+6:idx{1}+7);
+    temp = dir(char(NUC.filnms(i)));
+    str = datevec(temp.date);
+    CO.tim.day = str(3);
+    CO.tim.month = str(2);
+    CO.tim.year = str(1);
+    CO.tim.hr = str(4);
+    CO.tim.min = str(5);
+else
+    tempIdx = strfind(NUC.filnms(i),'/');
+    nm = char(NUC.filnms{i}(tempIdx{1}(length(tempIdx{:}))+1:end));
+    foo = strfind(nm, '-');
+    CO.rw = nm(foo(2)+1:foo(2)+3);
+    CO.cl = nm(foo(3)+1:foo(3)+3);
+    CO.filename = char(nm);
+    %Store the time from the file name
+    CO.tim.year = str2double(nm(1:4));
+    CO.tim.month = str2double(nm(5:6));
+    CO.tim.day = str2double(nm(7:8));
+    CO.tim.hr = str2double(nm(9:10));
+    CO.tim.min = str2double(nm(11:12));
+end
 %Initalize array that holds the label image for cytoplasm
 
 %Read in all the images into Im_array matrix and correct for illumination with CIDRE or
@@ -36,6 +53,9 @@ end
 
 if cidrecorrect
     tempIm = ((double(tempIm))./(Cyto.CH_1.CIDREmodel.v))*mean(Cyto.CH_1.CIDREmodel.v(:));
+elseif background_corr
+    cont = uint16(imread(CorrIm_file));
+    tempIm = (tempIm - cont);
 end
     
 %The image array holds all the different images read in
@@ -51,7 +71,10 @@ for q = 1:numCh
     end
     %Correct with CIDRE model or background correction
     if cidrecorrect
-        tempIm = ((double(tempIm))./(Cyto.(chnm).CIDREmodel.v))*mean(Cyto.(chnm).CIDREmodel.v(:));
+        tempIm = ((double(tempIm))./(Cyto.CH_1.CIDREmodel.v))*mean(Cyto.CH_1.CIDREmodel.v(:));
+    elseif background_corr
+        cont = uint16(imread(CorrIm_file));
+        tempIm = (tempIm - cont);
     end
     %For Channel correction not currently used but can be implimented for
     %spectral overlap
@@ -102,6 +125,10 @@ else
     noise = imtophat(SegIm_array(:,:,1), strel('disk', nuc_noise_disk));
     SegIm_array(:,:,1) = SegIm_array(:,:,1) - noise;
 
+    if numCh==0
+        SegIm_array(:,:,1) = imdilate(SegIm_array(:,:,1),strel('disk',smoothing_factor));
+    end
+            
     % Fill Holes
     SegIm_array(:,:,1) = imfill(SegIm_array(:,:,1), 'holes');
 
@@ -347,7 +374,7 @@ if numCh >0
 else
     border_cells = [Nuc_label(1,:)   Nuc_label(:,size(Nuc_label,2))'   Nuc_label(size(Nuc_label,1),:)  Nuc_label(:,1)'];
     border_cells = unique(border_cells(border_cells~=0));
-    CO.label = zeros(size(Nuc_label))
+    CO.label = zeros(size(Nuc_label));
     CO.numCytowoutNuc = 0;
     CO.numCyto = 0;
 end
